@@ -1,3 +1,37 @@
+const display = (function () {
+    const htmlBoard = document.querySelector("#board");
+
+    const clearBoard = (function () {
+        while (htmlBoard.firstChild) {
+            htmlBoard.removeChild(htmlBoard.lastChild);
+        }
+    });
+
+    const createBoard = (function (board) {
+        let j = 0, k = 0; // jk for board
+
+        while (j < 3) {
+            for (k = 0; k < 3; k++) { // each column
+                let temp = document.createElement("p");
+                temp.classList.add("space");
+                temp.textContent = board[j][k];
+                htmlBoard.appendChild(temp);
+
+                console.log(temp);
+            }
+            j++; // next row
+        }
+    });
+
+    const updateBoard = (function (board) {
+        clearBoard();
+
+        createBoard(board);
+    });
+
+    return { clearBoard, createBoard, updateBoard };
+}) ();
+
 const gameFlow = (function () {
     const player1 = createPlayer("Me", "X");
     const player2 = createPlayer("Not Me", "O");
@@ -130,4 +164,4 @@ let testBoard = [["A", "O", "O"],
                 ["-", "O", "O"],
                 ["O", "X", "A"]];
 
-console.log(gameBoard.checkWin(testBoard));
+display.createBoard(testBoard);
