@@ -15,9 +15,11 @@ const display = (function () {
                 let temp = document.createElement("p");
                 temp.classList.add("space");
                 temp.textContent = board[j][k];
+                temp.setAttribute('id', `${j}${k}`);
+                temp.addEventListener("click", function() {
+                    gameFlow.takeTurn(temp.getAttribute("id"));
+                });
                 htmlBoard.appendChild(temp);
-
-                console.log(temp);
             }
             j++; // next row
         }
@@ -36,7 +38,24 @@ const gameFlow = (function () {
     const player1 = createPlayer("Me", "X");
     const player2 = createPlayer("Not Me", "O");
 
-    return { player1, player2 };
+    let turn = true; // true for player1, false for player2
+
+    const takeTurn = (function (position) {
+        // position - char 0 is row, char 1 is column
+        let arr = position.split("").map(ele => parseInt(ele));
+        let row = arr[0];
+        let col = arr[1];
+
+        if (turn) {
+            gameBoard.addSymbol("X", row, col);
+            turn = false;
+        } else {
+            gameBoard.addSymbol("O", row, col);
+            turn = true;
+        }
+    });
+
+    return { player1, player2, takeTurn };
 })();
 
 const gameBoard = (function () {
@@ -44,10 +63,25 @@ const gameBoard = (function () {
                    ["", "", ""],
                    ["", "", ""]];
     
-    const addSymbol = (function (symbol, position) {
-        if (board[position-1] == '') {
-            board[position-1] = symbol;
+    const addSymbol = (function (symbol, row, col) {
+        /*if (position >= 1 && position <= 3) {
+            if (board[0][position-1] == '') {
+                board[0][position-1] = symbol;
+            }
+        } else if (position >= 4 && position <= 6) {
+            if (board[1][position-4] == '') {
+                board[1][position-4] = symbol;
+            }
+        } else if (position >= 7 && position <= 9) {
+            if (board[2][position-7] == '') {
+                board[2][position-7] = symbol;
+            }
+        }*/
+        if (board[row][col] == '') {
+            board[row][col] = symbol;
         }
+
+        display.updateBoard(board);
 
         return board;
     });
@@ -160,8 +194,11 @@ function createPlayer(name, symbol) {
 
 const player1 = createPlayer("Me", 'X');
 
-let testBoard = [["A", "O", "O"],
-                ["-", "O", "O"],
-                ["O", "X", "A"]];
+let testBoard = [["", "", ""],
+                ["", "", ""],
+                ["", "", ""]];
 
-display.createBoard(testBoard);
+display.createBoard(gameBoard.board);
+gameBoard.addSymbol("O", 1);
+
+display.updateBoard(gameBoard.board);
