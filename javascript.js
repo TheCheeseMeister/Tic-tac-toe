@@ -1,5 +1,38 @@
+/* Choose who goes first function on click */
+
+function select(event) {
+    event.preventDefault();
+
+    const check = document.getElementsByClassName("selected");
+
+    if (check.length != 0) {
+        check[0].classList.remove("selected");
+    }
+
+    event.target.classList.add("selected");
+}
+
+function start(event) {
+    event.preventDefault();
+
+    const choice = document.getElementsByClassName("selected")[0].textContent;
+
+    if (choice == "X" || choice == "O") {
+        gameFlow.setFirst(choice);
+        display.clearDialog();
+    }
+}
+
+/* Tic-Tac-Toe objects */
+
 const display = (function () {
     const htmlBoard = document.querySelector("#board");
+    const dialog = document.querySelector("#dialog");
+    dialog.showModal();
+
+    const clearDialog = (function () {
+        dialog.close();
+    });
 
     const clearBoard = (function () {
         while (htmlBoard.firstChild) {
@@ -31,7 +64,7 @@ const display = (function () {
         createBoard(board);
     });
 
-    return { clearBoard, createBoard, updateBoard };
+    return { clearBoard, createBoard, updateBoard, clearDialog };
 }) ();
 
 const gameFlow = (function () {
@@ -40,6 +73,10 @@ const gameFlow = (function () {
 
     let turn = true; // true for player1, false for player2
 
+    const setFirst = (function (symbol) {
+        turn = symbol == 'X' ? true : false;
+    });
+
     const takeTurn = (function (position) {
         // position - char 0 is row, char 1 is column
         let arr = position.split("").map(ele => parseInt(ele));
@@ -47,15 +84,21 @@ const gameFlow = (function () {
         let col = arr[1];
 
         if (turn) {
-            gameBoard.addSymbol("X", row, col);
-            turn = false;
+            let check = gameBoard.addSymbol("X", row, col);
+
+            if (check != "taken") turn = false;
         } else {
-            gameBoard.addSymbol("O", row, col);
-            turn = true;
+            let check = gameBoard.addSymbol("O", row, col);
+            
+            if (check != "taken") turn = true;
+        }
+        
+        if (gameBoard.checkWin() != null) {
+            console.log("yummer");
         }
     });
 
-    return { player1, player2, takeTurn };
+    return { player1, player2, takeTurn, setFirst };
 })();
 
 const gameBoard = (function () {
@@ -79,26 +122,25 @@ const gameBoard = (function () {
         }*/
         if (board[row][col] == '') {
             board[row][col] = symbol;
+            display.updateBoard(board);
+        } else {
+            return "taken";
         }
-
-        display.updateBoard(board);
-
-        return board;
     });
 
-    const checkWin = (function (testyBoard) {
+    const checkWin = (function () {
         // Check for match in row
         let match = true;
         let notedIndex = null;
         let notedSymbol = "";
-        for (let i = 0; i < testyBoard.length; i++) {
-            for (let j = 0; j < testyBoard.length; j++) {
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board.length; j++) {
                 if (j == 0) {
-                    notedSymbol = testyBoard[i][j];
+                    notedSymbol = board[i][j];
                     continue;
                 }
 
-                if (testyBoard[i][j] != notedSymbol || testyBoard[i][j] == '') {
+                if (board[i][j] != notedSymbol || board[i][j] == '') {
                     match = false;
                     notedIndex = null;
                     break;
@@ -115,14 +157,14 @@ const gameBoard = (function () {
         if (match && notedIndex != null) return `poggers at ${notedIndex} for ${notedSymbol}`;
 
         // Check for match in column
-        for (let i = 0; i < testyBoard.length; i++) {
-            for (let j = 0; j < testyBoard.length; j++) {
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board.length; j++) {
                 if (j == 0) {
-                    notedSymbol = testyBoard[j][i];
+                    notedSymbol = board[j][i];
                     continue;
                 }
 
-                if (testyBoard[j][i] != notedSymbol || testyBoard[j][i] == '') {
+                if (board[j][i] != notedSymbol || board[j][i] == '') {
                     match = false;
                     notedIndex = null;
                     break;
@@ -142,14 +184,14 @@ const gameBoard = (function () {
         // Top left -> bottom right
         let j = 0;
         match = true;
-        for (let i = 0; i < testyBoard.length; i++) {
+        for (let i = 0; i < board.length; i++) {
             if (i == 0) {
-                notedSymbol = testyBoard[i][j];
+                notedSymbol = board[i][j];
                 j++;
                 continue;
             }
 
-            if (testyBoard[j][i] != notedSymbol || testyBoard[j][i] == '') {
+            if (board[j][i] != notedSymbol || board[j][i] == '') {
                 match = false;
                 break;
             }
@@ -162,14 +204,14 @@ const gameBoard = (function () {
         // Top right -> bottom left
         j = 2;
         match = true;
-        for (let i = 0; i < testyBoard.length; i++) {
+        for (let i = 0; i < board.length; i++) {
             if (i == 0) {
-                notedSymbol = testyBoard[i][j];
+                notedSymbol = board[i][j];
                 j--;
                 continue;
             }
 
-            if (testyBoard[j][i] != notedSymbol || testyBoard[j][i] == '') {
+            if (board[j][i] != notedSymbol || board[j][i] == '') {
                 match = false;
                 break;
             }
@@ -179,7 +221,7 @@ const gameBoard = (function () {
 
         if (match) return `poggers on diagonal (TR->BL) for ${notedSymbol}`;
 
-        return "fuck";
+        return null;
     });
 
     return { board, addSymbol, checkWin };

@@ -49,3 +49,81 @@ body {
     height: 30px;
     padding-top: 6px;
 }
+
+/* Dialog */
+
+dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+
+    height: 400px;
+    width: 500px;
+    text-align: center;
+
+    padding: 32px;
+
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0 10px black;
+}
+
+dialog::backdrop {
+    background-color: rgba(90, 6, 6, 0.76);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    
+    height: 100%;
+}
+
+form > button {
+    height: 50px;
+    width: 100px;
+    border-radius: 10px;
+    align-self: center;
+    background-color: rgb(202, 84, 84);
+    color: white;
+    border:  none;
+
+    transition: all 0.3s ease-out;
+}
+
+form > button:hover {
+    scale: 1.1;
+    background-color: rgb(151, 62, 62);
+    cursor: pointer;
+}
+
+.select-container {
+    display: flex;
+    justify-content: center;
+
+    gap: 70px;
+}
+
+.selection {
+    background-color: rgb(204, 162, 162);
+    color: white;
+
+    font-size: 48px;
+    padding: 50px;
+    border-radius: 15px;
+
+    transition: all 0.2s ease-out;
+}
+
+.selection:hover {
+    scale: 1.1;
+    background-color: rgb(192, 103, 103);
+    cursor: pointer;
+}
+
+.selected {
+    scale: 1.1;
+    background-color: rgb(192, 103, 103);
+}
